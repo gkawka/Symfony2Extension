@@ -66,6 +66,7 @@ class Symfony2Extension implements ExtensionInterface
         $builder
             ->addDefaultsIfNotSet()
             ->children()
+                ->scalarNode('client')->defaultValue('Symfony\Bundle\FrameworkBundle\Client')->end()
                 ->arrayNode('kernel')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -107,6 +108,7 @@ class Symfony2Extension implements ExtensionInterface
         $this->loadKernel($container, $config['kernel']);
         $this->loadSuiteGenerator($container, $config['context']);
         $this->loadServiceArgumentResolver($container);
+        $this->loadClient($container, $config['client']);
     }
 
     /**
@@ -195,5 +197,14 @@ class Symfony2Extension implements ExtensionInterface
         ));
         $definition->addTag(ContextExtension::ARGUMENT_RESOLVER_TAG, array('priority' => 0));
         $container->setDefinition('symfony2_extension.context.argument.service_resolver', $definition);
+    }
+
+    private function loadClient(ContainerBuilder $container, $clientClass)
+    {
+        if(true === $container->hasDefinition('tester.symfony2extension.client')){
+            return;
+        }
+
+        $container->setParameter('test.client.class',$clientClass);
     }
 }
